@@ -1235,6 +1235,24 @@ void NativeWindowMac::SetContentProtection(bool enable) {
                                  : NSWindowSharingReadOnly];
 }
 
+void NativeWindowMac::AddBrowserView(
+    brightray::InspectableWebContentsView* child_web_contents_view) {
+  NSView* view = inspectable_web_contents()->GetView()->GetNativeView();
+  NSView* child_view = child_web_contents_view->GetNativeView();
+  [view.superview addSubview:child_view
+                  positioned:NSWindowAbove
+                  relativeTo:nil];
+  [child_view setFrame:view.frame];
+  child_view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+  [child_view setHidden:NO];
+}
+
+void NativeWindowMac::RemoveBrowserView(
+    brightray::InspectableWebContentsView* child_web_contents_view) {
+  NSView* child_view = child_web_contents_view->GetNativeView();
+  [child_view removeFromSuperview];
+}
+
 void NativeWindowMac::SetParentWindow(NativeWindow* parent) {
   if (is_modal())
     return;
